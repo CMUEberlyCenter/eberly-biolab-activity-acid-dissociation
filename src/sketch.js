@@ -8,14 +8,12 @@ import '@cmu-eberly-center/p5/lib/addons/p5.dom.js';
 import 'p5.play';
 import Beaker from 'p5.beaker/beaker.js';
 import ConjugateBase from 'p5.beaker/conjugate_base.js';
-import Plotly from 'plotly.js-dist';
 import Proton from 'p5.beaker/proton.js';
 
 const numInitialProtons = 10;
-const numConjugateBases = 10;
-let numProtons = 0;
-let numAcids = 0;
-
+export const numConjugateBases = 10;
+export let numProtons = 0;
+export let numAcids = 0;
 
 var particleTableUpdate = function(pNumAcids,pNumConjugateBases) {
     pNumAcids.html(numAcids);
@@ -96,24 +94,9 @@ var inputPHSetup = function(beaker,inputPH) {
     inputPHUpdate(inputPH);
 }
 
-var UISetup = function(p,beaker) {
-    p.createP('H(pH)').id("hph-label");
-    p.createP('high').id("high-label");
-    p.createP('low').id("low-label");
-
-    var pNumConjugateBases = p.createP(numConjugateBases).
-        id("num-conjugate-bases");
-    var pNumAcids = p.createP(numAcids).id("num-acids");
-    particleTableSetup(p,pNumAcids,pNumConjugateBases);
-
-    var sliderNumProtons = p.createSlider(0,64,numInitialProtons).
-        id('num-protons');
-    inputNumProtonsSetup(beaker,sliderNumProtons);
-
-    var inputPH = p.createInput('0').id('ph');
-    inputPHSetup(beaker,inputPH);
-
-    // Register callbacks to update UI
+// Register callbacks to update UI
+var registerUICallbacks = function(sliderNumProtons,inputPH,
+                                   pNumAcids,pNumConjugateBases) {
     Proton.prototype.
         register_callback("Proton","post",
                           () => {
@@ -147,6 +130,26 @@ var UISetup = function(p,beaker) {
                           });
 }
 
+var UISetup = function(p,beaker) {
+    p.createP('H(pH)').id("hph-label");
+    p.createP('high').id("high-label");
+    p.createP('low').id("low-label");
+
+    var pNumConjugateBases = p.createP(numConjugateBases).
+        id("num-conjugate-bases");
+    var pNumAcids = p.createP(numAcids).id("num-acids");
+    particleTableSetup(p,pNumAcids,pNumConjugateBases);
+
+    var sliderNumProtons = p.createSlider(0,64,numInitialProtons).
+        id('num-protons');
+    inputNumProtonsSetup(beaker,sliderNumProtons);
+
+    var inputPH = p.createInput('0').id('ph');
+    inputPHSetup(beaker,inputPH);
+
+    registerUICallbacks(sliderNumProtons,inputPH,pNumAcids,pNumConjugateBases);
+}
+
 /**
  * A Biolab sketch
  * @class Sketch
@@ -177,52 +180,3 @@ export default function Sketch(p) {
         beaker.draw();
     };
 }
-
-var rand = function() {
-    return numAcids/numConjugateBases;
-}
-
-Plotly.react('graph',
-             {
-                 "config": {
-                     "displaylogo": false,
-                     'modeBarButtonsToRemove': ['lasso2d']
-                 },
-                 "data": [
-                     {"line": {"width": 4},
-                      "marker": {"color": 'gray',"size": 8},
-                      "mode": 'lines',
-                      "y": [1].map(rand)}
-                 ],
-                 "frames": [],
-                 "layout": {
-                     "title": "Fraction Protonated Over Time",
-                     "xaxis": {"range": [0,10],
-                               "title": 'time'},
-                     "yaxis": {"range": [0,1],
-                               "title": 'fraction protonated'}
-                 }
-             });
-var cnt = 0;
-var interval = setInterval(() => {
-
-    Plotly.extendTraces('graph',{
-        "y": [[rand()]]
-    },[0])
-
-    if (cnt > 10) {
-        Plotly.animate('graph',{
-            "layout": {
-                "xaxis": {"range": [cnt-10,cnt+1]}
-            }
-        },{
-            "transition": {
-                "duration": 500,
-                "easing": 'cubic-in-out'
-            }
-        })
-    }
-
-    cnt += 1;
-    if (cnt === 100) clearInterval(interval);
-},1000);
