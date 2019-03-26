@@ -10,16 +10,40 @@ import Plotly from 'plotly.js-basic-dist';
 
 /** @module graph */
 
+var rand = function() {
+    return numAcids/numConjugateBases;
+}
+
+var cnt = 0;
+var interval = setInterval(() => {
+
+    Plotly.extendTraces('graph',{
+        "y": [[rand()]]
+    },[0])
+
+    if (cnt > 10) {
+        Plotly.animate('graph',{
+            "layout": {
+                "xaxis": {"range": [cnt-10,cnt+1]}
+            }
+        },{
+            "transition": {
+                "duration": 500,
+                "easing": 'cubic-in-out'
+            }
+        })
+    }
+
+    cnt += 1;
+    if (cnt === 100) clearInterval(interval);
+},1000);
+
 /**
  * A beaker/particle container.
  * @class Graph
  * @param {element_id} - ID of the DOM container.
  */
 export default function Graph(element) {
-    var rand = function() {
-        return numAcids/numConjugateBases;
-    }
-
     Plotly.react(element,
                  {
                      "config": {
@@ -41,27 +65,5 @@ export default function Graph(element) {
                                    "title": 'fraction protonated'}
                      }
                  });
-    var cnt = 0;
-    var interval = setInterval(() => {
 
-        Plotly.extendTraces('graph',{
-            "y": [[rand()]]
-        },[0])
-
-        if (cnt > 10) {
-            Plotly.animate('graph',{
-                "layout": {
-                    "xaxis": {"range": [cnt-10,cnt+1]}
-                }
-            },{
-                "transition": {
-                    "duration": 500,
-                    "easing": 'cubic-in-out'
-                }
-            })
-        }
-
-        cnt += 1;
-        if (cnt === 100) clearInterval(interval);
-    },1000);
 }
