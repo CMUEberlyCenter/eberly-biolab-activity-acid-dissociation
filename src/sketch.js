@@ -114,35 +114,30 @@ var inputPHSetup = function(beaker,inputPH) {
 // Register callbacks to update UI
 var registerUICallbacks = function(sliderNumProtons,inputPH,
                                    pNumAcids,pNumConjugateBases) {
-    Proton.prototype.
-        register_callback("Proton","post",
+    Proton.prototype.register_callback("Proton","post",
                           () => {
                               numProtons+=1;
                               inputPHUpdate(inputPH);
                               sliderNumProtons.value(numProtons);
                           });
-    Proton.prototype.
-        register_callback("remove","post",
+    Proton.prototype.register_callback("remove","post",
                           () => {
                               numProtons-=1;
                               inputPHUpdate(inputPH);
                               sliderNumProtons.value(numProtons);
                           });
 
-    ConjugateBase.prototype.
-        register_callback("release_proton","pre",
+    ConjugateBase.prototype.register_callback("release_proton","pre",
                           () => {
                               numAcids-=1;
                               particleTableUpdate(pNumAcids,
                                                   pNumConjugateBases);
                               inputPHUpdate(inputPH);
                           });
-    ConjugateBase.prototype.
-        register_callback("reacts_with_proton","post",
+    ConjugateBase.prototype.register_callback("reacts_with_proton","post",
                           () => {
                               numAcids+=1;
-                              particleTableUpdate(pNumAcids,
-                                                  pNumConjugateBases);
+                              particleTableUpdate(pNumAcids,pNumConjugateBases);
                               inputPHUpdate(inputPH);
                           });
 }
