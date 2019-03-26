@@ -20,12 +20,17 @@ var particleTableUpdate = function(pNumAcids,pNumConjugateBases) {
     pNumConjugateBases.html(numConjugateBases-numAcids);
 }
 
-var particleTableColumn = function(p,table,images,label,data) {
-    var image_div = p.createDiv().class("particle");
-    images.forEach((image) => {
-        image_div.child(image);
-    });
-    var column = p.createDiv();
+var particleTableColumn = function(p,table,column_data) {
+    const images = column_data["images"];
+    const image_div = p.createDiv().class("particle");
+    if (images) {
+        images.forEach((image) => {
+            image_div.child(image);
+        });
+    }
+    const label = column_data["label"];
+    const data = column_data["data"];
+    const column = p.createDiv();
     column.
         child(image_div).
         child(p.createP(label).class("label")).
@@ -37,21 +42,33 @@ var particleTableSetup = function(p,pNumAcids,pNumConjugateBases) {
     var table = p.createDiv().id("particle-table")
 
     // Acid column
-    particleTableColumn(p,table,[
+    const acid_column_data = {};
+    acid_column_data["images"] = [
         p.createImg(ConjugateBase.prototype.
                     image_path,'Conjugate Base').class("base"),
         p.createImg(Proton.prototype.
                     image_path,'Proton').class("proton")
-    ],"acid",pNumAcids);
+    ];
+    acid_column_data["label"] = "acid";
+    acid_column_data["data"] = pNumAcids;
+    particleTableColumn(p,table,acid_column_data);
 
     // Comparison column
-    particleTableColumn(p,table,[],"&lt;=&gt;");
+    const comparison_column_data = {};
+    comparison_column_data["label"] = "&lt;=&gt;"
+    particleTableColumn(p,table,comparison_column_data);
 
     // Conjugate base column
-    particleTableColumn(p,table,[
+    const conjugate_base_column_data = {};
+    conjugate_base_column_data["images"] = [
         p.createImg(ConjugateBase.
-                    prototype.image_path,'Conjugate Base')
-    ],"conjugate base",pNumConjugateBases);
+                    prototype.image_path,
+                    'Conjugate Base')
+    ];
+    conjugate_base_column_data["label"] = "conjugate base";
+    conjugate_base_column_data["data"] = pNumConjugateBases;
+    particleTableColumn(p,table,conjugate_base_column_data);
+
 };
 
 var updateNumProtons = function(beaker,newNumProtons) {
